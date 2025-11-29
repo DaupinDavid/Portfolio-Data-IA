@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html class="dark" lang="fr">
+<head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <title>Portfolio Data Analyst & AI</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link href="https://fonts.googleapis.com" rel="preconnect"/>
+    <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;800;900&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+    
+    <style>
+        .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+        .mesh-gradient { background-color: #050505; position: relative; overflow-x: hidden; }
+        /* Dégradé Maillé (Vos codes couleurs) */
+        .mesh-gradient::before {
+            content: ""; position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background-image:
+                radial-gradient(circle at 15% 25%, rgba(0, 122, 255, 0.15) 0%, transparent 40%), /* #007AFF */
+                radial-gradient(circle at 85% 35%, rgba(131, 56, 236, 0.15) 0%, transparent 40%), /* #8338EC */
+                radial-gradient(circle at 70% 80%, rgba(244, 37, 175, 0.20) 0%, transparent 50%), /* #F425AF */
+                radial-gradient(circle at 30% 70%, rgba(108, 2, 2, 0.15) 0%, transparent 45%); /* #6C0202 */
+            filter: blur(100px); z-index: -1;
+        }
+        .glassmorphic {
+            background-color: rgba(20, 20, 20, 0.6); backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.08); transition: all 0.3s ease;
+        }
+        .glassmorphic:hover {
+            border-color: rgba(244, 37, 175, 0.3); transform: translateY(-2px);
+            background-color: rgba(30, 30, 30, 0.7);
+        }
+        /* Masquer la scrollbar tout en gardant le scroll */
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+        
+        /* Animation de la Modale */
+        #project-modal { transition: opacity 0.3s ease-in-out; }
+        #project-modal.hidden { opacity: 0; pointer-events: none; }
+        #project-modal:not(.hidden) { opacity: 1; pointer-events: auto; }
+
+        /* Style spécifique pour la carte image (hauteur fixe 180px) */
+        .project-card-image {
+            height: 180px;
+            object-fit: cover;
+            width: 100%;
+            margin-bottom: 16px;
+            border-radius: 12px;
+            opacity: 0.7;
+            transition: opacity 0.3s ease;
+        }
+        .project-card-image:hover { opacity: 1; }
+    </style>
+    
+    <script>
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: { "primary": "#f425af", "background-dark": "#050505" },
+                    fontFamily: { "display": ["Inter", "sans-serif"], "mono": ["JetBrains Mono", "monospace"] },
+                },
+            },
+        }
+    </script>
+</head>
+
+<body class="bg-background-dark font-display text-white mesh-gradient min-h-screen">
+
+    <div class="relative flex min-h-screen w-full flex-col items-center overflow-x-hidden p-4 sm:p-6 md:p-8">
+        <div class="flex h-full w-full max-w-6xl grow flex-col gap-10 md:gap-16">
+            
+            <nav class="flex justify-center pt-8 sticky top-0 z-50">
+                <div class="glassmorphic rounded-full p-1 flex relative">
+                    <button onclick="filterProjects('data')" id="btn-data" class="rounded-full px-6 py-2 text-sm font-bold transition-all bg-white/10 text-white shadow-[0_0_15px_rgba(255,255,255,0.1)]">
+                        PROJETS DATA & IA
+                    </button>
+                    <button onclick="filterProjects('transversal')" id="btn-transversal" class="rounded-full px-6 py-2 text-sm font-medium text-gray-400 transition-all hover:text-white">
+                        PROJETS TRANSVERSAUX
+                    </button>
+                </div>
+            </nav>
+
+            <header class="flex flex-col items-center justify-center gap-6 text-center mt-4">
+                <h1 class="text-5xl font-black leading-tight tracking-tighter md:text-7xl flex flex-col gap-1 md:gap-2">
+                    <span class="block text-white drop-shadow-lg" id="hero-1"></span>
+                    <span class="block bg-gradient-to-r from-blue-500 via-purple-500 to-fuchsia-500 bg-clip-text text-transparent pb-2" id="hero-2"></span>
+                    <span class="block bg-gradient-to-r from-blue-500 via-purple-500 to-fuchsia-500 bg-clip-text text-transparent pb-2" id="hero-3"></span>
+                </h1>
+                <h2 class="mt-4 text-sm font-bold uppercase tracking-[0.3em] text-gray-500" id="user-title"></h2>
+                
+                <div class="max-w-3xl mx-auto text-center mt-8 px-2">
+                    <div class="glassmorphic p-8 rounded-2xl border border-white/10 relative overflow-hidden">
+                        <div class="absolute -top-10 -right-10 w-32 h-32 bg-primary/20 blur-3xl rounded-full"></div>
+                        <h3 class="text-primary font-bold uppercase tracking-widest text-xs mb-4 relative z-10">À Propos</h3>
+                        <p class="text-gray-300 text-lg leading-relaxed relative z-10" id="user-about"></p>
+                    </div>
+                </div>
+
+                <div class="mt-6 flex flex-wrap justify-center gap-4">
+                    <a id="contact-btn" href="#" class="glassmorphic px-6 py-3 rounded-full font-bold hover:text-primary transition-colors flex items-center gap-2 border-white/20">
+                        <span class="material-symbols-outlined">mail</span> Me Contacter
+                    </a>
+                    <a href="cv.pdf" target="_blank" class="px-6 py-3 rounded-full font-bold bg-white text-black hover:bg-gray-200 transition-colors flex items-center gap-2 shadow-[0_0_20px_rgba(255,255,255,0.3)]">
+                        <span class="material-symbols-outlined">download</span> Télécharger CV
+                    </a>
+                </div>
+            </header>
+
+            <section class="w-full overflow-hidden opacity-80 py-4">
+                <div class="flex w-full overflow-hidden [mask-image:_linear-gradient(to_right,transparent_0,_black_128px,_black_calc(100%-128px),transparent_100%)]">
+                    <div class="flex w-max animate-[scroll_30s_linear_infinite] items-center gap-12 font-mono text-gray-400 text-sm">
+                        <span>PYTHON</span> <span>SQL</span> <span>POWERBI</span> <span>TABLEAU</span> <span>GEMINI-AI</span> <span>DOCKER</span> <span>GIT</span> <span>PANDAS</span> <span>PLOTLY</span> <span>STITCH</span>
+                        <span>PYTHON</span> <span>SQL</span> <span>POWERBI</span> <span>TABLEAU</span> <span>GEMINI-AI</span> <span>DOCKER</span> <span>GIT</span> <span>PANDAS</span> <span>PLOTLY</span> <span>STITCH</span>
+                    </div>
+                </div>
+            </section>
+
+            <main id="projects-grid" class="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-2 max-w-5xl mx-auto w-full transition-opacity duration-500">
+                </main>
+
+            <footer class="flex flex-col items-center gap-6 py-10 text-center text-sm text-gray-500 border-t border-white/5 mt-10">
+            </footer>
+        </div>
+    </div>
+
+    <div id="project-modal" class="fixed inset-0 z-[100] hidden flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
+        <div class="glassmorphic w-full max-w-3xl rounded-2xl p-8 relative max-h-[90vh] overflow-y-auto border border-white/10 bg-[#0a0a0a]">
+            <button onclick="closeModal()" class="absolute top-4 right-4 text-gray-400 hover:text-white material-symbols-outlined">close</button>
+            
+            <div id="modal-content">
+                <div class="flex flex-col gap-2 mb-6">
+                    <span id="modal-tag" class="text-xs font-mono w-fit bg-primary/20 text-primary px-2 py-1 rounded">TAG</span>
+                    <h2 id="modal-title" class="text-3xl font-black text-white">Titre du Projet</h2>
+                </div>
+                
+                <div id="modal-body" class="text-gray-300 leading-relaxed space-y-4">
+                    </div>
+
+                <div class="mt-8 pt-6 border-t border-white/10">
+                    <h4 class="text-sm font-bold uppercase text-gray-500 mb-3">Technologies</h4>
+                    <div id="modal-stack" class="flex flex-wrap gap-2">
+                        </div>
+                </div>
+                
+                <div class="mt-8 pt-6 border-t border-white/10">
+                    <h4 class="text-sm font-bold uppercase text-gray-500 mb-3">Visuels du Projet</h4>
+                    <div id="modal-gallery" class="grid grid-cols-2 gap-4">
+                        </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // --- 1. TES DONNÉES (VALIDÉES) ---
+        const portfolioData = {
+            personal: {
+                name: "TON PRÉNOM NOM",
+                title: "DATA ANALYST - DATA & IA",
+                email: "tonemail@exemple.com",
+                heroLine1: "De la Donnée Brute",
+                heroLine2: "à l'Intelligence Créative &", 
+                heroLine3: "Décisionnelle...",
+                about: "Étudiant en 1ʳᵉ année du Programme Grande École chez <strong class='text-white'>HETIC</strong>, spécialisé en <strong class='text-white'>Data & IA</strong>.<br><br><strong class='text-white'>Explore</strong>, <strong class='text-white'>Analyse</strong> et <strong class='text-white'>Modélise</strong> les données pour <strong class='text-white'>Générer</strong> des Insights et des Systèmes Intelligents.<br><br>Objectif : <strong class='text-white'>Concevoir</strong> des Plateformes Interactives et des Solutions Digitales Optimisées, orientées Utilisateur et Impact Business..."
+            },
+            projects: [
+                {
+                    id: "dual-ride",
+                    category: "data",
+                    title: "DUAL RIDE", 
+                    tag: "BUSINESS INTELLIGENCE & GEN AI",
+                    // CORRECTION ICI: Suppression de 'img/' pour le chemin d'accès
+                    shortDescription: "IA Générative & Data Viz au service de l’équilibre<br>Désir Client vs Rentabilité Industrielle.", 
+                    
+                    // CHEMINS DES IMAGES (CORRIGÉ : PLUS DE SOUS-DOSSIER 'img/')
+                    imageCover: "dualridecover.png", 
+                    imagesModal: [ // 12 images (de 0.png à 11.png)
+                        "0.png", "1.png", "2.png", "3.png", 
+                        "4.png", "5.png", "6.png", "7.png", 
+                        "8.png", "9.png", "10.png", "11.png"
+                    ],
+                    
+                    fullDescription: `
+                        <h4 class="text-primary font-bold mb-2">Le Problème Business</h4>
+                        <p class="mb-4">Comment générer le point d'équilibre parfait entre l'exigence du client et la contrainte industrielle pour produire la configuration moto offrant la rentabilité maximale aux deux parties ?</p>
+                        
+                        <h4 class="text-primary font-bold mb-2">La Solution Technique</h4>
+                        <p class="mb-2 font-semibold text-white">Stratégie Globale :</p>
+                        <p class="mb-4">Mise en place d'un pipeline End-to-End palliant l'absence de données réelles :</p>
+                        <ul class="list-disc list-inside mb-4 space-y-1">
+                            <li><strong>Data Synthétique :</strong> Génération et calibration de 15 400 profils utilisateurs (Jumeau Numérique) pour simuler le marché.</li>
+                            <li><strong>Design Génératif :</strong> Workflow de prototypage rapide (Text-to-3D) pour visualiser les concepts 'Néo-Rétro' demandés.</li>
+                            <li><strong>Intelligence Décisionnelle :</strong> Développement d'une architecture web hybride intégrant une Data Viz interactive (Matrice de Rentabilité) injectée directement dans le code pour guider la décision industrielle.</li>
+                        </ul>
+
+                        <h4 class="text-primary font-bold mb-2">L'Impact Décisionnel</h4>
+                        <p>Le projet démontre que l'IA n'a pas seulement servi à dessiner une moto, mais à résoudre une équation économique complexe : la réponse au conflit 'Désir vs Coût'.</p>
+                    `,
+                    // STACK TECHNIQUE CORRIGÉE ET COMPLÈTE
+                    techStack: [
+                        "Python", "Gemini", "Aidemos/Meta (SAM)",
+                        "Reve & Tripo3D", "Stitch", "Plotly.js", 
+                        "<model-viewer>"
+                    ]
+                }
+            ]
+        };
+
+        // --- 2. INITIALISATION (Ne rien modifier) ---
+        document.getElementById('hero-1').textContent = portfolioData.personal.heroLine1;
+        document.getElementById('hero-2').textContent = portfolioData.personal.heroLine2;
+        document.getElementById('hero-3').textContent = portfolioData.personal.heroLine3;
+        document.getElementById('user-title').textContent = portfolioData.personal.title;
+        document.getElementById('user-about').innerHTML = portfolioData.personal.about; 
+        document.getElementById('contact-btn').href = "mailto:" + portfolioData.personal.email;
+
+        // --- 3. FONCTIONS (Ne rien modifier) ---
+        function renderProjects(filterType) {
+            const grid = document.getElementById('projects-grid');
+            grid.innerHTML = ''; 
+
+            const filteredProjects = portfolioData.projects.filter(p => p.category === filterType || filterType === 'all');
+
+            filteredProjects.forEach(proj => {
+                const card = document.createElement('div');
+                card.className = `flex flex-col rounded-2xl p-4 glassmorphic group cursor-pointer hover:border-primary/50 transition-all`;
+                card.onclick = () => openModal(proj); 
+
+                card.innerHTML = `
+                    <img src="${proj.imageCover}" alt="Couverture du projet ${proj.title}" class="project-card-image">
+                    <div class="flex flex-col gap-2 p-2">
+                        <div class="flex justify-between items-center">
+                            <h3 class="text-2xl font-bold text-white group-hover:text-primary transition-colors">${proj.title}</h3>
+                            <span class="text-xs font-mono bg-white/10 text-gray-300 px-2 py-1 rounded">${proj.tag}</span>
+                        </div>
+                        <p class="text-gray-300 leading-relaxed line-clamp-2 text-sm">
+                            ${proj.shortDescription}
+                        </p>
+                        <div class="flex flex-wrap gap-2 mt-auto pt-2 border-t border-white/5">
+                            <span class="text-xs text-primary font-bold flex items-center gap-1">
+                                VOIR LES DÉTAILS <span class="material-symbols-outlined text-sm">arrow_forward</span>
+                            </span>
+                        </div>
+                    </div>
+                `;
+                grid.appendChild(card);
+            });
+        }
+
+        function openModal(project) {
+            document.getElementById('modal-title').textContent = project.title;
+            document.getElementById('modal-tag').textContent = project.tag;
+            document.getElementById('modal-body').innerHTML = project.fullDescription;
+            
+            const stackContainer = document.getElementById('modal-stack');
+            stackContainer.innerHTML = '';
+            project.techStack.forEach(tech => {
+                const span = document.createElement('span');
+                span.className = "rounded-full bg-white/5 px-3 py-1 text-xs font-mono text-gray-300 border border-white/5";
+                span.textContent = tech;
+                stackContainer.appendChild(span);
+            });
+
+            const galleryContainer = document.getElementById('modal-gallery');
+            galleryContainer.innerHTML = '';
+            project.imagesModal.forEach(imgSrc => {
+                const img = document.createElement('img');
+                img.src = imgSrc;
+                img.alt = `Visuel du projet ${project.title}`;
+                img.className = 'w-full h-auto rounded-lg object-cover border border-white/5';
+                galleryContainer.appendChild(img);
+            });
+
+            document.getElementById('project-modal').classList.remove('hidden');
+            document.body.style.overflow = 'hidden'; 
+        }
+
+        function closeModal() {
+            document.getElementById('project-modal').classList.add('hidden');
+            document.body.style.overflow = 'auto'; 
+        }
+
+        document.getElementById('project-modal').addEventListener('click', (e) => {
+            if (e.target.id === 'project-modal') closeModal();
+        });
+
+        function filterProjects(type) {
+            const btnData = document.getElementById('btn-data');
+            const btnTransversal = document.getElementById('btn-transversal');
+            
+            if (type === 'data') {
+                btnData.classList.add('bg-white/10', 'text-white', 'shadow-[0_0_15px_rgba(255,255,255,0.1)]');
+                btnData.classList.remove('text-gray-400');
+                btnTransversal.classList.remove('bg-white/10', 'text-white', 'shadow-[0_0_15px_rgba(255,255,255,0.1)]');
+                btnTransversal.classList.add('text-gray-400');
+                renderProjects('data');
+            } else {
+                btnTransversal.classList.add('bg-white/10', 'text-white', 'shadow-[0_0_15px_rgba(255,255,255,0.1)]');
+                btnTransversal.classList.remove('text-gray-400');
+                btnData.classList.remove('bg-white/10', 'text-white', 'shadow-[0_0_15px_rgba(255,255,255,0.1)]');
+                btnData.classList.add('text-gray-400');
+                // Message pour l'onglet transversal
+                document.getElementById('projects-grid').innerHTML = `
+                    <div class="col-span-1 md:col-span-2 text-center py-12 glassmorphic rounded-2xl border border-dashed border-white/10">
+                        <span class="material-symbols-outlined text-4xl text-gray-600 mb-2">construction</span>
+                        <p class="text-gray-400 italic">Projets transversaux en cours d'intégration...</p>
+                    </div>
+                `;
+            }
+        }
+
+        // Lancement immédiat
+        renderProjects('data');
+
+    </script>
+    
+    <style>
+      @keyframes scroll {
+        to { transform: translate(calc(-50% - 3rem)); }
+      }
+    </style>
+</body>
+</html>
